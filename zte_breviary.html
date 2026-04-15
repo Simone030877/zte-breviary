@@ -1,0 +1,1618 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Breviario ZTE - Guida in tasca per promoter con tracker progressi">
+    <title>ZTE Breviary</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%23000' width='180' height='180'/><text x='90' y='100' font-family='Montserrat' font-size='60' font-weight='bold' fill='%2300C8FF' text-anchor='middle'>ZTE</text></svg>">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #00C8FF;
+            --dark: #000000;
+            --bg: #0a0a0a;
+            --surface: #1a1a1a;
+            --surface-light: #2a2a2a;
+            --text: #ffffff;
+            --text-secondary: #b0b0b0;
+            --success: #00a84f;
+            --danger: #c41e3a;
+        }
+
+        html, body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            padding: 20px;
+            background: linear-gradient(135deg, #000 0%, #1a1a1a 100%);
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            border-radius: 16px;
+            padding: 40px 30px;
+            width: 100%;
+            max-width: 360px;
+            box-shadow: 0 10px 40px rgba(0, 200, 255, 0.1);
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--primary) 0%, #00a8d8 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--dark);
+            margin: 0 auto 30px;
+            box-shadow: 0 0 30px rgba(0, 200, 255, 0.3);
+        }
+
+        .login-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-align: center;
+            background: linear-gradient(90deg, var(--text) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-subtitle {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--surface-light);
+            border: 1px solid var(--surface-light);
+            border-radius: 8px;
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 2px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(0, 200, 255, 0.3);
+        }
+
+        .login-btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(90deg, var(--primary) 0%, #00a8d8 100%);
+            border: none;
+            border-radius: 8px;
+            color: var(--dark);
+            font-weight: 700;
+            font-size: 14px;
+            font-family: 'Montserrat', sans-serif;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .login-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 200, 255, 0.3);
+        }
+
+        .login-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .login-error {
+            display: none;
+            padding: 12px;
+            background: rgba(196, 30, 58, 0.1);
+            border: 1px solid var(--danger);
+            border-radius: 6px;
+            color: var(--danger);
+            font-size: 12px;
+            text-align: center;
+            margin-top: 16px;
+        }
+
+        .login-error.show {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 4px;
+            height: 4px;
+            background: var(--primary);
+            border-radius: 50%;
+            animation: blink 1.5s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25% { opacity: 0.3; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        /* Main App */
+        .app {
+            display: none;
+            flex: 1;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app.active {
+            display: flex;
+        }
+
+        .container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--dark) 0%, #1a1a1a 100%);
+            padding: 16px;
+            border-bottom: 2px solid var(--primary);
+            flex-shrink: 0;
+            box-shadow: 0 4px 20px rgba(0, 200, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header h1 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            background: linear-gradient(90deg, var(--text) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: var(--dark);
+            font-size: 16px;
+            box-shadow: 0 0 20px rgba(0, 200, 255, 0.3);
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .user-badge {
+            background: rgba(0, 200, 255, 0.2);
+            padding: 6px 10px;
+            border-radius: 4px;
+            color: var(--primary);
+            font-weight: 600;
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .logout-btn {
+            background: rgba(196, 30, 58, 0.1);
+            border: 1px solid var(--danger);
+            color: var(--danger);
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background: rgba(196, 30, 58, 0.2);
+        }
+
+        /* Main Content */
+        .main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+
+        .view {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow: auto;
+            scroll-behavior: smooth;
+        }
+
+        .view.active {
+            display: flex;
+        }
+
+        /* Home View */
+        .search-section {
+            padding: 20px 16px;
+            background: linear-gradient(180deg, var(--surface) 0%, transparent 100%);
+            border-bottom: 1px solid var(--surface-light);
+            flex-shrink: 0;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            flex: 1;
+            background: var(--surface-light);
+            border: 1px solid var(--surface-light);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: var(--text);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 12px rgba(0, 200, 255, 0.3);
+        }
+
+        .filters {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+
+        .filters::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filter-btn {
+            padding: 8px 14px;
+            background: var(--surface-light);
+            border: 1px solid var(--surface-light);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .filter-btn:hover,
+        .filter-btn.active {
+            background: var(--primary);
+            color: var(--dark);
+            border-color: var(--primary);
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            padding: 16px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .product-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            border-radius: 12px;
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease-out forwards;
+            opacity: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .product-card:hover {
+            background: var(--surface-light);
+            border-color: var(--primary);
+            box-shadow: 0 0 20px rgba(0, 200, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .product-name {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+            color: var(--primary);
+        }
+
+        .product-target {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+        }
+
+        .product-meta {
+            display: flex;
+            gap: 12px;
+            font-size: 11px;
+            color: var(--text-secondary);
+        }
+
+        .badge {
+            background: rgba(0, 200, 255, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            border-left: 2px solid var(--primary);
+        }
+
+        /* Detail View */
+        .detail-view {
+            overflow-y: auto;
+        }
+
+        .detail-header {
+            padding: 20px 16px;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--surface-light) 100%);
+            border-bottom: 1px solid var(--surface-light);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 14px;
+            cursor: pointer;
+            margin-bottom: 12px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .product-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+            background: linear-gradient(90deg, var(--text) 0%, var(--primary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .product-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .detail-content {
+            padding: 16px;
+        }
+
+        .spec-section {
+            margin-bottom: 24px;
+        }
+
+        .spec-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 12px;
+        }
+
+        .spec-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .spec-item {
+            background: var(--surface);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--primary);
+        }
+
+        .spec-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .spec-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            margin-top: 6px;
+            letter-spacing: 0.5px;
+        }
+
+        .feature-list {
+            background: var(--surface);
+            border-left: 3px solid var(--primary);
+            padding: 16px;
+            border-radius: 8px;
+        }
+
+        .feature-item {
+            margin-bottom: 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            padding-left: 12px;
+            border-left: 2px solid rgba(0, 200, 255, 0.3);
+        }
+
+        .selling-tips {
+            background: rgba(0, 200, 255, 0.08);
+            border: 1px solid rgba(0, 200, 255, 0.2);
+            padding: 14px;
+            border-radius: 8px;
+            margin-top: 16px;
+        }
+
+        .tip-text {
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        /* Quiz View */
+        .quiz-view {
+            overflow-y: auto;
+        }
+
+        .quiz-progress {
+            padding: 16px;
+            background: var(--surface);
+            border-bottom: 1px solid var(--surface-light);
+        }
+
+        .progress-bar {
+            height: 4px;
+            background: var(--surface-light);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, #00a8d8 100%);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .progress-text {
+            font-size: 12px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        .quiz-content {
+            padding: 20px 16px;
+        }
+
+        .question {
+            margin-bottom: 24px;
+        }
+
+        .question-number {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .question-text {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option {
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            padding: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+            font-weight: 500;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .option:hover {
+            border-color: var(--primary);
+            background: var(--surface-light);
+        }
+
+        .option.selected {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: var(--dark);
+            font-weight: 600;
+        }
+
+        .results {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            text-align: center;
+        }
+
+        .score-circle {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary) 0%, #00a8d8 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 800;
+            color: var(--dark);
+            margin-bottom: 20px;
+            box-shadow: 0 10px 40px rgba(0, 200, 255, 0.3);
+        }
+
+        .results-title {
+            font-size: 24px;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+
+        .results-subtitle {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 24px;
+        }
+
+        .sync-message {
+            font-size: 12px;
+            margin-top: 16px;
+            padding: 10px;
+            background: rgba(0, 200, 255, 0.1);
+            border-radius: 6px;
+            color: var(--primary);
+        }
+
+        /* Tracker View */
+        .tracker-view {
+            overflow-y: auto;
+            padding: 16px;
+        }
+
+        .tracker-card {
+            background: var(--surface);
+            border: 1px solid var(--surface-light);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .tracker-stat {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-box {
+            background: var(--surface-light);
+            padding: 16px;
+            border-radius: 8px;
+            text-align: center;
+            border-left: 3px solid var(--primary);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 6px;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .history-item {
+            background: var(--surface-light);
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            border-left: 3px solid var(--primary);
+            font-size: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 14px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: var(--dark);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 200, 255, 0.3);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .btn-secondary {
+            background: var(--surface);
+            color: var(--text);
+            border: 1px solid var(--surface-light);
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-group .btn {
+            flex: 1;
+        }
+
+        /* Nav Bar */
+        .nav-bar {
+            display: flex;
+            background: var(--surface);
+            border-top: 1px solid var(--surface-light);
+            gap: 0;
+            flex-shrink: 0;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 12px;
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            font-family: 'Montserrat', sans-serif;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-top: 2px solid transparent;
+        }
+
+        .nav-btn.active {
+            color: var(--primary);
+            border-top-color: var(--primary);
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-card">
+            <div class="login-logo">ZTE</div>
+            <h2 class="login-title">BREVIARY</h2>
+            <p class="login-subtitle">Guida in Tasca</p>
+            
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label class="form-label">PIN Promoter</label>
+                    <input 
+                        type="text" 
+                        class="form-input" 
+                        id="pinInput" 
+                        placeholder="0000"
+                        maxlength="6"
+                        autocomplete="off"
+                    >
+                </div>
+                
+                <button type="submit" class="login-btn" id="loginBtn">Accedi</button>
+            </form>
+            
+            <div class="login-error" id="loginError"></div>
+            <p style="font-size: 11px; color: var(--text-secondary); margin-top: 20px; text-align: center;">
+                Connessione: <span id="connectionStatus">Online</span>
+            </p>
+        </div>
+    </div>
+
+    <!-- Main App -->
+    <div class="app" id="appContainer">
+        <div class="container">
+            <div class="header">
+                <div class="header-left">
+                    <div class="logo">ZTE</div>
+                    <h1>BREVIARY</h1>
+                </div>
+                <div class="user-info">
+                    <div>
+                        <div class="user-badge" id="userDisplay">Offline</div>
+                    </div>
+                    <button class="logout-btn" onclick="handleLogout()">LOGOUT</button>
+                </div>
+            </div>
+
+            <div class="main">
+                <!-- Home View -->
+                <div class="view active" id="homeView">
+                    <div class="search-section">
+                        <div class="search-box">
+                            <input 
+                                type="text" 
+                                class="search-input" 
+                                id="searchInput" 
+                                placeholder="Cerca prodotto..."
+                            >
+                        </div>
+                        <div class="filters" id="filterContainer"></div>
+                    </div>
+                    <div class="products-grid" id="productsGrid"></div>
+                </div>
+
+                <!-- Detail View -->
+                <div class="view" id="detailView">
+                    <div class="detail-header">
+                        <button class="back-btn" onclick="showHome()">← Indietro</button>
+                        <div id="detailContent"></div>
+                    </div>
+                    <div class="detail-content" id="specContent"></div>
+                </div>
+
+                <!-- Quiz View -->
+                <div class="view" id="quizView">
+                    <div class="quiz-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-text" id="progressText">Domanda 1 di 15</div>
+                    </div>
+                    <div id="quizContainer"></div>
+                </div>
+
+                <!-- Tracker View -->
+                <div class="view" id="trackerView">
+                    <h2 class="spec-title" style="margin-bottom: 16px;">📊 Miei Progressi</h2>
+                    <div class="tracker-card">
+                        <div class="tracker-stat">
+                            <div class="stat-box">
+                                <div class="stat-value" id="totalTests">0</div>
+                                <div class="stat-label">Quiz Completati</div>
+                            </div>
+                            <div class="stat-box">
+                                <div class="stat-value" id="avgScore">0%</div>
+                                <div class="stat-label">Media Voti</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tracker-card">
+                        <h3 class="spec-title">Storico Quiz</h3>
+                        <div id="historyList" style="max-height: 300px; overflow-y: auto;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="nav-bar">
+                <button class="nav-btn active" onclick="switchView('home')">
+                    <span class="nav-icon">📚</span>
+                    Breviario
+                </button>
+                <button class="nav-btn" onclick="switchView('quiz')">
+                    <span class="nav-icon">🎮</span>
+                    Quiz
+                </button>
+                <button class="nav-btn" onclick="switchView('tracker')">
+                    <span class="nav-icon">📊</span>
+                    Progressi
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ====== CONFIGURATION ======
+        // IMPORTANTISSIMO: Sostituisci con l'URL del tuo Google Apps Script deployato
+        const GOOGLE_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwPHgL8qVk486C-hJyss71UTPySg5qbXX2ANI0zQ42EU_gg-X-aq5dGoD9l6ghq0TOLSg/exec';
+        
+        // Product Data
+        const products = [
+            {
+                id: 1,
+                name: "nubia Neo 5 GT 5G",
+                target: "Pro-Gaming / Cliente evoluto",
+                category: "Gaming",
+                price: "Premium",
+                hero: "Trigger AI e VC Cooling",
+                ram: "20GB",
+                storage: "256GB",
+                battery: "6210 mAh",
+                features: [
+                    "Game Space AI 5.0 + Assistente virtuale Demi",
+                    "Trigger AI laterali + DTS:X Ultra",
+                    "6210mAh · Ricarica 45W",
+                    "Memory Fusion fino a 20GB RAM",
+                    "Chipset MediaTek Dimensity 7400",
+                    "Display OLED 120Hz da 6.8\""
+                ],
+                tips: "Sul Neo 5GT 5G mostra sempre la fluidità durante lo scrolling: «Nessun lag, fluido e scorrevole come un top di gamma!»"
+            },
+            {
+                id: 2,
+                name: "nubia Air",
+                target: "Premium / Design",
+                category: "Design",
+                price: "Premium",
+                hero: "Sottilissimo 6.7mm",
+                ram: "20GB",
+                storage: "256GB",
+                battery: "5000 mAh",
+                features: [
+                    "Tripla Protezione IP68, IP69, IP69K",
+                    "Spessore 6.7mm - Ultra leggero (170g)",
+                    "Fotocamera 108MP AI",
+                    "Display AMOLED 120Hz da 6.77\"",
+                    "Ricarica rapida 45W",
+                    "Sblocco Under Display"
+                ],
+                tips: "Fa sempre impugnare il modello AIR al cliente. Il suo peso piuma ti aiuterà molto a chiudere la vendita."
+            },
+            {
+                id: 3,
+                name: "nubia Air PRO",
+                target: "Premium / Design",
+                category: "Design",
+                price: "Premium",
+                hero: "Sottilissimo 5.99mm + IP69K",
+                ram: "20GB",
+                storage: "512GB",
+                battery: "5000 mAh",
+                features: [
+                    "Spessore 5.99mm - Ultra sottile (172g)",
+                    "Tripla Protezione IP68, IP69, IP69K",
+                    "Doppia fotocamera 108MP + Selfie 32MP",
+                    "Display AMOLED 120Hz da 6.77\"",
+                    "Ricarica rapida 45W",
+                    "512GB Storage incluso",
+                    "Sblocco Under Display"
+                ],
+                tips: "Nonostante sia così sottile è più resistente di quasi tutti i top di gamma della concorrenza."
+            },
+            {
+                id: 4,
+                name: "ZTE V80 Pro",
+                target: "Photography Enthusiast",
+                category: "Fotografia",
+                price: "Premium",
+                hero: "Camera 108MP & Display 1000 nits",
+                ram: "20GB",
+                storage: "256GB",
+                battery: "5000 mAh",
+                features: [
+                    "Camera 108MP con Intelligenza Artificiale",
+                    "Display High-Res 1000 nits - 120Hz da 6.7\"",
+                    "Live Island 2.0 (Notifiche interattive)",
+                    "Android 16 di serie",
+                    "Memory Fusion fino a 20GB RAM",
+                    "Ricarica rapida 18W"
+                ],
+                tips: "È il primo smartphone della categoria con Live Island 2.0 e Android 16 di serie."
+            },
+            {
+                id: 5,
+                name: "ZTE V80 Max",
+                target: "Streaming & Big Display",
+                category: "Entertainment",
+                price: "Mid-Range",
+                hero: "Display Gigante da 6.9\" + 6000 mAh",
+                ram: "8GB",
+                storage: "128GB",
+                battery: "6000 mAh",
+                features: [
+                    "Display gigantesco 6.9\" - 120Hz",
+                    "Batteria 6000 mAh con AI energetica",
+                    "Live Island 2.0 + Android 16",
+                    "Tripla fotocamera 50MP con AI",
+                    "Ricarica rapida 18W"
+                ],
+                tips: "Chi vive di streaming, serie TV e video. Lo schermo da 6.9\" è il «cinema in tasca»."
+            },
+            {
+                id: 6,
+                name: "ZTE V80 Vita",
+                target: "Pratico / Stile",
+                category: "Style",
+                price: "Mid-Range",
+                hero: "Design Ultrasottile & Display 120Hz",
+                ram: "20GB",
+                storage: "256GB",
+                battery: "5000 mAh",
+                features: [
+                    "Design elegante e ultrasottile",
+                    "Display High-Res 120Hz da 6.75\"",
+                    "Tripla fotocamera 50MP con AI",
+                    "Live Island 2.0 + Android 16",
+                    "Batteria 5000 mAh a lunga durata"
+                ],
+                tips: "Equilibrio tra design, resistenza ed affidabilità. Cerca uno smartphone semplice ma efficiente."
+            },
+            {
+                id: 7,
+                name: "ZTE Blade A36",
+                target: "Entry Level Evoluto",
+                category: "Value",
+                price: "Entry",
+                hero: "Android 15 & Display 6.75\"",
+                ram: "12GB",
+                storage: "128GB",
+                battery: "5000 mAh",
+                features: [
+                    "Android 15 con Processore Octa-core",
+                    "Display waterdrop HD+ da 6.75\" - 90Hz",
+                    "Memory Fusion fino a 12GB RAM",
+                    "Batteria 5000 mAh affidabile",
+                    "Riconoscimento facciale"
+                ],
+                tips: "Secondo telefono, regalo, primo smartphone. Tecnologia reale a un prezzo sorprendente."
+            }
+        ];
+
+        // Quiz Data (15 questions per Breviario)
+        const quizQuestions = [
+            {
+                q: "Qual è la particolarità principale del nubia Neo 5 GT 5G?",
+                options: ["Design sottile", "Ecosistema Gaming con Game Space AI 5.0", "Fotocamera 108MP", "Schermo gigante"],
+                correct: 1
+            },
+            {
+                q: "Che spessore ha il nubia Air?",
+                options: ["5.99mm", "7.7mm", "6.7mm", "8.4mm"],
+                correct: 2
+            },
+            {
+                q: "Quanti megapixel ha la fotocamera del nubia Air PRO?",
+                options: ["50MP", "108MP (doppia)", "200MP", "64MP"],
+                correct: 1
+            },
+            {
+                q: "Qual è il vantaggio principale della memoria ZTE?",
+                options: ["Più veloce", "256GB al prezzo dei 128GB", "Meno consuma", "Migliore gaming"],
+                correct: 1
+            },
+            {
+                q: "Quale modello è ideale per chi ama foto perfette?",
+                options: ["Neo 5 GT", "V80 Max", "V80 Pro", "Blade A36"],
+                correct: 2
+            },
+            {
+                q: "Quanta batteria ha il Neo 5 GT?",
+                options: ["5000 mAh", "5500 mAh", "6000 mAh", "6210 mAh"],
+                correct: 3
+            },
+            {
+                q: "Che significa IP69K?",
+                options: ["Impermeabile a 1,5mt", "Resiste a getti d'acqua ad alta pressione", "Certificazione gaming", "Impermeabile totale"],
+                correct: 1
+            },
+            {
+                q: "Quale modello ha il display da 1000 nits?",
+                options: ["V80 Max", "V80 Pro", "Air PRO", "Blade A36"],
+                correct: 1
+            },
+            {
+                q: "Cos'è la Live Island 2.0?",
+                options: ["Un videogame", "Un sistema di notifiche interattive", "Una app di navigazione", "Un assistente vocale"],
+                correct: 1
+            },
+            {
+                q: "Quale modello è perfetto per lo streaming?",
+                options: ["Neo 5 GT", "V80 Pro", "V80 Max", "Blade A36"],
+                correct: 2
+            },
+            {
+                q: "Quanta RAM massima (Memory Fusion) V80 Pro?",
+                options: ["12GB", "16GB", "20GB", "24GB"],
+                correct: 2
+            },
+            {
+                q: "Qual è la ricarica del nubia Air?",
+                options: ["18W", "25W", "45W", "65W"],
+                correct: 2
+            },
+            {
+                q: "Quale è lo smartphone entry-level evoluto?",
+                options: ["V80 Vita", "Blade A36", "Air", "V80 Max"],
+                correct: 1
+            },
+            {
+                q: "Quale modello pesa solo 172g?",
+                options: ["Air", "Air PRO", "Neo 5 GT", "V80 Pro"],
+                correct: 1
+            },
+            {
+                q: "Cosa differenzia Air PRO da Air?",
+                options: ["Il prezzo", "Spessore minore (5.99mm) e fotocamera doppia 108MP", "La batteria", "L'OS"],
+                correct: 1
+            }
+        ];
+
+        // State
+        let currentUser = null;
+        let currentQuizIndex = 0;
+        let quizAnswers = [];
+        let isOnline = navigator.onLine;
+
+        // Connection status
+        window.addEventListener('online', () => {
+            isOnline = true;
+            updateConnectionStatus();
+        });
+
+        window.addEventListener('offline', () => {
+            isOnline = false;
+            updateConnectionStatus();
+        });
+
+        function updateConnectionStatus() {
+            const status = document.getElementById('connectionStatus');
+            status.textContent = isOnline ? '🟢 Online' : '🔴 Offline';
+        }
+
+        // Initialize
+        function init() {
+            updateConnectionStatus();
+            const stored = localStorage.getItem('zte_user');
+            if (stored) {
+                currentUser = JSON.parse(stored);
+                showApp();
+                renderProducts();
+                setupFilters();
+                setupSearch();
+                loadTrackerStats();
+            } else {
+                showLogin();
+            }
+        }
+
+        // Login
+        async function handleLogin(e) {
+            e.preventDefault();
+            const pin = document.getElementById('pinInput').value;
+            const btn = document.getElementById('loginBtn');
+            
+            if (!pin) {
+                showLoginError('Inserisci il PIN');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Accedi ' + '<span class="loading"></span>';
+
+            try {
+                if (!isOnline) {
+                    // Offline: usa lista locale
+                    showLoginError('Connessione richiesta per il primo accesso');
+                    btn.disabled = false;
+                    btn.textContent = 'Accedi';
+                    return;
+                }
+
+                // Online: valida con Google Apps Script
+                const response = await fetch(GOOGLE_APPS_SCRIPT_URL + '?action=validatePin&pin=' + encodeURIComponent(pin), {
+                    method: 'POST'
+                });
+                const data = await response.json();
+
+                if (data.valid) {
+                    currentUser = {
+                        pin: data.promoter.pin,
+                        nome: data.promoter.nome,
+                        cognome: data.promoter.cognome,
+                        negozio: data.promoter.negozio,
+                        loginTime: new Date().toISOString()
+                    };
+                    localStorage.setItem('zte_user', JSON.stringify(currentUser));
+                    showApp();
+                    renderProducts();
+                    setupFilters();
+                    setupSearch();
+                    loadTrackerStats();
+                } else {
+                    showLoginError('PIN non valido');
+                    document.getElementById('pinInput').value = '';
+                }
+            } catch (error) {
+                showLoginError('Errore di connessione. Riprova.');
+                console.error('Login error:', error);
+            }
+
+            btn.disabled = false;
+            btn.textContent = 'Accedi';
+        }
+
+        function showLoginError(msg) {
+            const error = document.getElementById('loginError');
+            error.textContent = msg;
+            error.classList.add('show');
+            setTimeout(() => error.classList.remove('show'), 3000);
+        }
+
+        function handleLogout() {
+            if (confirm('Vuoi davvero uscire?')) {
+                currentUser = null;
+                currentQuizIndex = 0;
+                quizAnswers = [];
+                localStorage.removeItem('zte_user');
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            document.getElementById('loginScreen').classList.remove('hidden');
+            document.getElementById('appContainer').classList.remove('active');
+            document.getElementById('pinInput').focus();
+        }
+
+        function showApp() {
+            document.getElementById('loginScreen').classList.add('hidden');
+            document.getElementById('appContainer').classList.add('active');
+            const user = currentUser;
+            document.getElementById('userDisplay').innerHTML = `<span class="user-badge">${user.nome} ${user.cognome}</span>`;
+        }
+
+        // Products
+        function renderProducts(searchTerm = '', filterCategory = 'all') {
+            const grid = document.getElementById('productsGrid');
+            let filtered = products;
+
+            if (searchTerm) {
+                filtered = filtered.filter(p => 
+                    p.name.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+            }
+
+            if (filterCategory !== 'all') {
+                filtered = filtered.filter(p => p.price === filterCategory);
+            }
+
+            if (filtered.length === 0) {
+                grid.innerHTML = '<div class="empty-state"><div style="font-size: 48px;">🔍</div><div>Nessun prodotto trovato</div></div>';
+                return;
+            }
+
+            grid.innerHTML = filtered.map((p, i) => `
+                <div class="product-card" style="animation-delay: ${i * 0.05}s" onclick="showDetail(${p.id})">
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-target">${p.target}</div>
+                    <div class="product-meta">
+                        <div class="badge">${p.category}</div>
+                        <div class="badge">${p.price}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function setupFilters() {
+            const filters = ['all', 'Entry', 'Mid-Range', 'Premium'];
+            const container = document.getElementById('filterContainer');
+            container.innerHTML = filters.map(f => 
+                `<button class="filter-btn ${f === 'all' ? 'active' : ''}" onclick="filterProducts('${f}')">${f === 'all' ? 'Tutti' : f}</button>`
+            ).join('');
+        }
+
+        function setupSearch() {
+            const input = document.getElementById('searchInput');
+            input.addEventListener('input', (e) => {
+                const active = document.querySelector('.filter-btn.active');
+                const filter = active ? (active.textContent === 'Tutti' ? 'all' : active.textContent) : 'all';
+                renderProducts(e.target.value, filter);
+            });
+        }
+
+        function filterProducts(category) {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            event.target.classList.add('active');
+            const search = document.getElementById('searchInput').value;
+            const cat = category === 'Tutti' ? 'all' : category;
+            renderProducts(search, cat);
+        }
+
+        function showDetail(id) {
+            const product = products.find(p => p.id === id);
+            const header = document.getElementById('detailContent');
+            const content = document.getElementById('specContent');
+
+            header.innerHTML = `
+                <h2 class="product-title">${product.name}</h2>
+                <p class="product-subtitle">${product.target}</p>
+            `;
+
+            content.innerHTML = `
+                <div class="spec-section">
+                    <div class="spec-title">📊 Specifiche</div>
+                    <div class="spec-grid">
+                        <div class="spec-item">
+                            <div class="spec-value">${product.ram}</div>
+                            <div class="spec-label">RAM</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-value">${product.storage}</div>
+                            <div class="spec-label">Storage</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-value">${product.battery}</div>
+                            <div class="spec-label">Batteria</div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-value">${product.hero}</div>
+                            <div class="spec-label">Hero Feature</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="spec-section">
+                    <div class="spec-title">✨ Caratteristiche</div>
+                    <div class="feature-list">
+                        ${product.features.map(f => `<div class="feature-item">• ${f}</div>`).join('')}
+                    </div>
+                </div>
+
+                <div class="spec-section">
+                    <div class="spec-title">💡 Argomento di Vendita</div>
+                    <div class="selling-tips">
+                        <div class="tip-text">${product.tips}</div>
+                    </div>
+                </div>
+            `;
+
+            switchViewDirect('detail');
+            document.getElementById('detailView').scrollTop = 0;
+        }
+
+        function showHome() {
+            switchView('home');
+        }
+
+        // View Management
+        function switchView(view) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            if (view === 'home') {
+                document.getElementById('homeView').classList.add('active');
+                document.querySelector('[onclick="switchView(\'home\')"]').classList.add('active');
+            } else if (view === 'quiz') {
+                document.getElementById('quizView').classList.add('active');
+                document.querySelector('[onclick="switchView(\'quiz\')"]').classList.add('active');
+                if (currentQuizIndex === 0) showQuizQuestion();
+            } else if (view === 'tracker') {
+                document.getElementById('trackerView').classList.add('active');
+                document.querySelector('[onclick="switchView(\'tracker\')"]').classList.add('active');
+                loadTrackerStats();
+            }
+        }
+
+        function switchViewDirect(view) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            if (view === 'detail') {
+                document.getElementById('detailView').classList.add('active');
+            }
+        }
+
+        // Quiz
+        function showQuizQuestion() {
+            if (currentQuizIndex >= quizQuestions.length) {
+                showQuizResults();
+                return;
+            }
+
+            const q = quizQuestions[currentQuizIndex];
+            const container = document.getElementById('quizContainer');
+            const progress = ((currentQuizIndex) / quizQuestions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('progressText').textContent = `Domanda ${currentQuizIndex + 1} di ${quizQuestions.length}`;
+
+            container.innerHTML = `
+                <div class="quiz-content">
+                    <div class="question">
+                        <div class="question-number">Domanda ${currentQuizIndex + 1}</div>
+                        <div class="question-text">${q.q}</div>
+                        <div class="options">
+                            ${q.options.map((opt, i) => `
+                                <div class="option" onclick="selectAnswer(${i})">${opt}</div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+                <div style="padding: 0 16px 16px; margin-top: 16px;">
+                    <button class="btn btn-primary" id="nextBtn" disabled onclick="nextQuestion()" style="width: 100%;">Continua</button>
+                </div>
+            `;
+
+            document.querySelectorAll('.option').forEach((opt, i) => {
+                opt.addEventListener('click', () => {
+                    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                    opt.classList.add('selected');
+                    quizAnswers[currentQuizIndex] = i;
+                    document.getElementById('nextBtn').disabled = false;
+                });
+            });
+        }
+
+        function selectAnswer(index) {
+            document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+            document.querySelectorAll('.option')[index].classList.add('selected');
+            quizAnswers[currentQuizIndex] = index;
+            document.getElementById('nextBtn').disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuizIndex++;
+            showQuizQuestion();
+        }
+
+        async function showQuizResults() {
+            const correct = quizAnswers.filter((ans, i) => ans === quizQuestions[i].correct).length;
+            const percentage = Math.round((correct / quizQuestions.length) * 100);
+            
+            // Salva localmente
+            saveQuizResultLocal(percentage, correct);
+
+            // Prova a sincronizzare con Google Sheet
+            if (isOnline) {
+                try {
+                    await saveQuizResultToSheet(percentage, correct);
+                    syncMsg = '<div class="sync-message">✅ Risultato salvato online</div>';
+                } catch (e) {
+                    console.log('Sync offline:', e);
+                    syncMsg = '<div class="sync-message">📱 Salvato localmente (sincronizzerai online)</div>';
+                }
+            } else {
+                syncMsg = '<div class="sync-message">📱 Salvato localmente (sincronizzerai online)</div>';
+            }
+
+            const syncMsg = isOnline ? '<div class="sync-message">✅ Risultato salvato</div>' : '<div class="sync-message">📱 Salvato localmente</div>';
+
+            document.getElementById('quizContainer').innerHTML = `
+                <div class="results">
+                    <div class="score-circle">${percentage}%</div>
+                    <div class="results-title">${percentage >= 80 ? '🎉 Eccellente!' : percentage >= 60 ? '👍 Buono!' : '📚 Continua a studiare'}</div>
+                    <div class="results-subtitle">${correct} su ${quizQuestions.length} risposte corrette</div>
+                    ${syncMsg}
+                    <div style="display: flex; gap: 10px; margin-top: 20px; width: 100%; padding: 0 20px;">
+                        <button class="btn btn-primary" style="flex: 1;" onclick="resetQuiz()">Ripeti Quiz</button>
+                        <button class="btn btn-secondary" style="flex: 1;" onclick="switchView('home')">Chiudi</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function saveQuizResultLocal(percentage, correct) {
+            let history = JSON.parse(localStorage.getItem(`zte_history_${currentUser.pin}`) || '[]');
+            history.push({
+                date: new Date().toLocaleString('it-IT'),
+                score: percentage,
+                correct: correct,
+                total: quizQuestions.length
+            });
+            localStorage.setItem(`zte_history_${currentUser.pin}`, JSON.stringify(history));
+        }
+
+        async function saveQuizResultToSheet(percentage, correct) {
+            const data = {
+                pin: currentUser.pin,
+                nome: currentUser.nome,
+                cognome: currentUser.cognome,
+                negozio: currentUser.negozio,
+                score: percentage,
+                correct: correct,
+                total: quizQuestions.length
+            };
+
+            const response = await fetch(GOOGLE_APPS_SCRIPT_URL, {
+                method: 'POST',
+                payload: JSON.stringify({
+                    action: 'saveQuizResult',
+                    data: data
+                })
+            });
+
+            return response.json();
+        }
+
+        function resetQuiz() {
+            currentQuizIndex = 0;
+            quizAnswers = [];
+            showQuizQuestion();
+        }
+
+        // Tracker
+        function loadTrackerStats() {
+            const history = JSON.parse(localStorage.getItem(`zte_history_${currentUser.pin}`) || '[]');
+            
+            if (history.length === 0) {
+                document.getElementById('totalTests').textContent = '0';
+                document.getElementById('avgScore').textContent = '0%';
+                document.getElementById('historyList').innerHTML = '<p style="font-size: 12px; color: var(--text-secondary); text-align: center; padding: 20px;">Nessun quiz completato ancora</p>';
+                return;
+            }
+
+            const avg = Math.round(history.reduce((a, b) => a + b.score, 0) / history.length);
+
+            document.getElementById('totalTests').textContent = history.length;
+            document.getElementById('avgScore').textContent = avg + '%';
+
+            document.getElementById('historyList').innerHTML = history.reverse().map(h => `
+                <div class="history-item">
+                    <span>${h.date}</span>
+                    <span style="color: var(--primary); font-weight: 700;">${h.score}%</span>
+                </div>
+            `).join('');
+        }
+
+        // Initialize on load
+        window.addEventListener('load', init);
+    </script>
+</body>
+</html>
