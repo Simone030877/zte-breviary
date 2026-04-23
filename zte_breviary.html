@@ -1570,38 +1570,40 @@
             saveQuizResultLocal(percentage, correct);
 
             // Prova a sincronizzare con Google Sheet
+            let syncMsg = '';
             if (isOnline) {
                 try {
                     await saveQuizResultToSheet(percentage, correct);
-                    syncMsg = '<div class="sync-message">✅ Risultato salvato online</div>';
+                    syncMsg = '✅ Risultato salvato online';
                 } catch (e) {
                     console.log('Sync offline:', e);
-                    syncMsg = '<div class="sync-message">📱 Salvato localmente (sincronizzerai online)</div>';
+                    syncMsg = '📱 Salvato localmente (sincronizzerai online)';
                 }
             } else {
-                syncMsg = '<div class="sync-message">📱 Salvato localmente (sincronizzerai online)</div>';
+                syncMsg = '📱 Salvato localmente (sincronizzerai online)';
             }
 
-            const syncMsg = isOnline ? '<div class="sync-message">✅ Risultato salvato</div>' : '<div class="sync-message">📱 Salvato localmente</div>';
-
-            document.getElementById('quizContainer').innerHTML = `
-                <div class="results" style="max-height: 80vh; overflow-y: auto;">
-                    <div style="text-align: center; margin-bottom: 20px;">
-                        <div class="score-circle" style="font-size: 48px; margin-bottom: 10px;">${percentage}%</div>
-                        <div style="font-size: 20px; font-weight: 800; color: #00C8FF; margin-bottom: 5px;">${percentage >= 80 ? '⭐ EXPERT' : percentage >= 60 ? '🟦 PRO' : '🔴 ROOKIE'}</div>
-                        <div class="results-title">${percentage >= 80 ? '🎉 Eccellente!' : percentage >= 60 ? '👍 Buono!' : '📚 Continua a studiare'}</div>
-                        <div class="results-subtitle">${correct} su ${quizQuestions.length} risposte corrette</div>
-                    </div>
-                    
-                    <div id="errorSummary"></div>
-                    
-                    ${syncMsg}
-                    <div style="display: flex; gap: 10px; margin-top: 20px; width: 100%; padding: 0 20px 20px;">
-                        <button class="btn btn-primary" style="flex: 1;" onclick="resetQuiz()">🔄 Ripeti Quiz</button>
-                        <button class="btn btn-secondary" style="flex: 1;" onclick="switchView('home')">📚 Torna al Breviario</button>
-                    </div>
-                </div>
-            `;
+            // MOSTRA LA RESULTS SCREEN
+            document.getElementById('quizScreen').style.display = 'none';
+            document.getElementById('resultsScreen').style.display = 'block';
+            
+            // POPOLA I DATI
+            document.getElementById('finalScore').textContent = percentage + '%';
+            document.getElementById('finalSubtitle').textContent = correct + ' su ' + quizQuestions.length + ' risposte corrette';
+            document.getElementById('finalSyncMsg').textContent = syncMsg;
+            
+            // Badge e titolo
+            let badge = '⭐';
+            let title = '🎉 Eccellente!';
+            if (percentage < 80 && percentage >= 60) {
+                badge = '🟦';
+                title = '👍 Buono!';
+            } else if (percentage < 60) {
+                badge = '🔴';
+                title = '📚 Continua a studiare';
+            }
+            document.getElementById('finalBadge').textContent = badge;
+            document.getElementById('finalTitle').textContent = title;
             
             // Genera il summary degli errori
             const wrongAnswers = quizAnswers.map((ans, i) => ({
@@ -1612,11 +1614,10 @@
                 isWrong: ans !== quizQuestions[i].correct
             })).filter(a => a.isWrong);
             
-            const errorDiv = document.getElementById('errorSummary');
+            const errorDiv = document.getElementById('finalErrorSummary');
             if (wrongAnswers.length > 0) {
-                errorDiv.innerHTML = `<div style="background: rgba(200, 0, 0, 0.1); border: 1px solid #C80000; border-radius: 12px; padding: 15px; margin: 20px; margin-top: 30px;">
-                    <h4 style="color: #C80000; margin-bottom: 15px; font-size: 14px;">❌ RISPOSTE SBAGLIATE:</h4>
-                    ${wrongAnswers.map(w => `
+                errorDiv.innerHTML = `<h4 style="color: #C80000; margin-bottom: 15px; font-size: 14px;">❌ RISPOSTE SBAGLIATE:</h4>` +
+                    wrongAnswers.map(w => `
                         <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid rgba(200,0,0,0.2);">
                             <div style="color: #888; font-size: 12px; margin-bottom: 5px;">Domanda ${w.idx}</div>
                             <div style="color: #fff; font-size: 13px; margin-bottom: 8px;">${w.question}</div>
@@ -1627,10 +1628,9 @@
                                 <div style="color: #00C800; font-size: 12px;">✅ Risposta corretta: ${w.correctAnswer}</div>
                             </div>
                         </div>
-                    `).join('')}
-                </div>`;
+                    `).join('');
             } else {
-                errorDiv.innerHTML = '<div style="background: rgba(0, 200, 0, 0.1); border: 1px solid #00C800; border-radius: 12px; padding: 15px; margin: 20px; text-align: center; color: #00C800; font-weight: 600;">✅ Perfetto! Hai risposto correttamente a tutte le domande!</div>';
+                errorDiv.innerHTML = '<div style="text-align: center; color: #00C800; font-weight: 600; padding: 15px;">✅ Perfetto! Hai risposto correttamente a tutte le domande!</div>';
             }
         }
 
